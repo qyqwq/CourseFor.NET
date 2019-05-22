@@ -12,7 +12,7 @@ namespace ClassDesign
         private MySqlConnection conn = null;//连接
         private MySqlCommand cmd = null;//提交指令
         private MySqlDataReader reader = null;//结果集
-        private String constr = "Server=localhost; Database=book_manage; UID=root; PWD=chy1415926;";
+        private String constr = "Server=localhost; Database=book_manage; UID=root;";
         private MySqlDataAdapter apt = null;
         private BindingSource source_ok = null;
         private BindingSource source_get = null;
