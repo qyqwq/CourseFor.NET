@@ -53,6 +53,24 @@ namespace ClassDesign
             DateTime dt = startTime.AddSeconds(stamp);
             return dt.ToString("yyyy/MM/dd");
         }
+        private string find_name(string id)
+        {
+
+            if (id == "ok")
+            {
+                return "未被借走";
+            }
+            MySqlConnection conn_name = new MySqlConnection(constr);
+            conn_name.Open();
+            string sql_name = "SELECT user_name FROM usr WHERE user_id = '" + id + "'";
+            MySqlCommand cmd_name = new MySqlCommand(sql_name, conn_name);
+            MySqlDataReader reader_name = cmd_name.ExecuteReader();
+            reader_name.Read();
+            string name = reader_name[0].ToString();
+            reader_name.Close();
+            conn_name.Close();
+            return name;
+        }
         private DataTable InitializeData(DataTable dataTable)
         {
             DataTable sel = new DataTable();
@@ -67,11 +85,11 @@ namespace ClassDesign
             {
                 if(x[3].ToString() == "ok")
                 {
-                    sel.Rows.Add(x[0], x[1], x[2], x[3], "-", "-");
+                    sel.Rows.Add(x[0], x[1], x[2], find_name(x[3].ToString()), "-", "-");
                 }
                 else
                 {
-                    sel.Rows.Add(x[0], x[1], x[2], x[3], get_time_str(x[4].ToString()), get_time_str(x[5].ToString()));
+                    sel.Rows.Add(x[0], x[1], x[2], find_name(x[3].ToString()), get_time_str(x[4].ToString()), get_time_str(x[5].ToString()));
                 }
                 
             }
