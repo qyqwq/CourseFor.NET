@@ -11,7 +11,7 @@ namespace ClassDesign
         string get_id = null;
         private MySqlConnection conn = null;//连接
         private MySqlCommand cmd = null;//提交指令
-        private String constr = "Server=localhost; Database=book_manage; UID=root; PWD=3.141592654;";
+        private String constr = "Server=localhost; Database=book_manage; UID=root; ";
         private MySqlDataAdapter apt = null;
         private DataTable dataTable = null;
         private BindingSource bindingSource = null;
@@ -37,13 +37,46 @@ namespace ClassDesign
             apt.SelectCommand = cmd;
             dataTable.Clear();
             apt.Fill(dataTable);
+
+            DataTable sel = InitializeData(dataTable);
+
             bindingSource = new BindingSource();
-            bindingSource.DataSource = dataTable;
+            bindingSource.DataSource = sel;
             dataGridView1.DataSource = bindingSource;
             bindingNavigator1.BindingSource = bindingSource;
             conn.Close();
         }
-
+        private string get_time_str(string stampStr)
+        {
+            long.TryParse(stampStr, out long stamp);
+            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
+            DateTime dt = startTime.AddSeconds(stamp);
+            return dt.ToString("yyyy/MM/dd");
+        }
+        private DataTable InitializeData(DataTable dataTable)
+        {
+            DataTable sel = new DataTable();
+            sel.Columns.Add("book_id", typeof(string));
+            sel.Columns.Add("book_name", typeof(string));
+            sel.Columns.Add("book_author", typeof(string));
+            sel.Columns.Add("book_status", typeof(string));
+            sel.Columns.Add("lend_time", typeof(string));
+            sel.Columns.Add("back_time", typeof(string));
+            DataRow[] dataRow = dataTable.Select();
+            foreach (DataRow x in dataRow)
+            {
+                if(x[3].ToString() == "ok")
+                {
+                    sel.Rows.Add(x[0], x[1], x[2], x[3], "-", "-");
+                }
+                else
+                {
+                    sel.Rows.Add(x[0], x[1], x[2], x[3], get_time_str(x[4].ToString()), get_time_str(x[5].ToString()));
+                }
+                
+            }
+            return sel;
+        }
         private void Button1_Click(object sender, EventArgs e)
         {
             string text = textBox1.Text;
@@ -56,6 +89,7 @@ namespace ClassDesign
             {
                 sel.Rows.Add(x.ItemArray);
             }
+            sel = InitializeData(sel);
             bindingSource.DataSource = sel;
         }
         private void TextBox1_TextChanged(object sender, EventArgs e)
@@ -99,7 +133,7 @@ namespace ClassDesign
                     MessageBox.Show("出版号重复！", "错误");
                     return;
                 }
-                dataTable.Rows.Add(get_id, "", "", "ok");
+                dataTable.Rows.Add(get_id, "", "", "ok",0,0);
             }
         }
     }
